@@ -102,6 +102,10 @@ module ActiveStorage
       { "Content-MD5" => checksum, "Content-Disposition" => content_disposition }
     end
 
+    def bucket #:nodoc:
+      @bucket ||= client.bucket(config.fetch(:bucket), skip_lookup: true)
+    end
+
     private
       def private_url(key, expires_in:, filename:, content_type:, disposition:, **)
         file_for(key).signed_url expires: expires_in, query: {
@@ -134,10 +138,6 @@ module ActiveStorage
           yield file.download(range: offset..(offset + chunk_size - 1)).string
           offset += chunk_size
         end
-      end
-
-      def bucket
-        @bucket ||= client.bucket(config.fetch(:bucket), skip_lookup: true)
       end
 
       def client
